@@ -1,323 +1,272 @@
-# SaaS Tools Platform
+# SaaS Tools Platform - Separated Backend & Frontend
 
-A comprehensive multi-tenant SaaS platform for e-commerce sellers, providing powerful tools for Amazon and Flipkart marketplace optimization.
+A comprehensive multi-tenant SaaS platform for e-commerce sellers with separated backend (Express.js) and frontend (Next.js) architecture.
 
-## 🚀 Features
+## 🏗️ Architecture
 
-### Public Landing Page
-- **CMS-Editable Content**: Hero sections, features, pricing tables
-- **Responsive Design**: Optimized for all device sizes
-- **SEO Optimized**: Meta tags, structured data, fast loading
-
-### Seller Portal
-- **Authentication**: JWT-based auth with email verification
-- **Tool Subscription**: Razorpay integration for payments
-- **Keyword Research Tool**: Amazon/Flipkart keyword analysis
-- **Usage Tracking**: Monitor API calls and tool usage
-- **Billing Management**: View invoices, manage subscriptions
-
-### Admin Portal
-- **User Management**: Search, filter, manage all users
-- **Tool Management**: Create, edit, disable tools dynamically
-- **Analytics Dashboard**: Revenue, usage, conversion metrics
-- **Manual Invoicing**: Generate custom invoices with PDFs
-- **Email Automation**: Template management and campaigns
-- **Landing Page CMS**: WYSIWYG editor for content updates
-
-### Technical Features
-- **Multi-tenant Architecture**: Secure data isolation
-- **Subscription Billing**: Automated recurring payments
-- **Email System**: Transactional and marketing emails
-- **PDF Generation**: Automated invoice creation
-- **Webhook Handling**: Razorpay payment notifications
-- **Rate Limiting**: API protection and fair usage
-- **Security**: Input validation, CORS, helmet.js
-
-## 🛠️ Tech Stack
-
-- **Frontend**: Next.js 13, React, Tailwind CSS, shadcn/ui
-- **Backend**: Next.js API Routes, Node.js
-- **Database**: SQLite with Prisma ORM
+### Backend (Port 5000)
+- **Framework**: Express.js with Node.js
+- **Database**: MySQL with Prisma ORM
 - **Authentication**: JWT with refresh tokens
-- **Payments**: Razorpay subscriptions and one-off payments
-- **Email**: Nodemailer with template system
-- **PDF**: PDFKit for invoice generation
-- **Deployment**: Docker, Kubernetes, GitHub Actions
+- **Features**: REST API, file uploads, PDF generation, email system
 
-## 📁 Project Structure
+### Frontend (Port 3000)
+- **Framework**: Next.js with React
+- **UI**: Tailwind CSS + shadcn/ui components
+- **State Management**: React hooks + localStorage
+- **Features**: Responsive design, real-time updates
 
-```
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   ├── auth/              # Authentication pages
-│   ├── dashboard/         # Seller dashboard
-│   ├── admin/             # Admin portal
-│   └── tools/             # Individual tool pages
-├── components/            # Reusable UI components
-├── lib/                   # Utility libraries
-│   ├── auth.ts           # Authentication utilities
-│   ├── database.ts       # Prisma client
-│   ├── email.ts          # Email services
-│   ├── pdf.ts            # PDF generation
-│   └── razorpay.ts       # Payment processing
-├── prisma/               # Database schema and migrations
-├── k8s/                  # Kubernetes manifests
-├── scripts/              # Database seeding and utilities
-└── public/               # Static assets
-```
-
-## 🚦 Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+
+- MySQL database (Hostinger or local)
 - npm or yarn
-- Git
 
-### 1. Clone and Install
+### 1. Backend Setup
+
 ```bash
-git clone <repository-url>
-cd saas-tools-platform
+cd backend
 npm install
 ```
 
-### 2. Environment Setup
-```bash
-# Copy environment template
-cp .env.example .env
+Create `.env` file:
+```env
+# Database (Replace with your Hostinger MySQL credentials)
+DATABASE_URL="mysql://username:password@hostname:3306/database_name"
 
-# Edit .env with your configuration
-# - Database URL
-# - JWT secrets
-# - Razorpay credentials
-# - SMTP settings
+# Server
+PORT=5000
+NODE_ENV=development
+
+# JWT Secrets (Generate strong secrets)
+JWT_SECRET="your-super-secret-jwt-key-here-make-it-long-and-complex"
+JWT_REFRESH_SECRET="your-super-secret-refresh-key-here-make-it-different"
+
+# Razorpay
+RAZORPAY_KEY_ID="your-razorpay-key-id"
+RAZORPAY_KEY_SECRET="your-razorpay-key-secret"
+
+# Email (Gmail example)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="your-email@gmail.com"
+SMTP_PASS="your-app-password"
+
+# URLs
+FRONTEND_URL="http://localhost:3000"
+BACKEND_URL="http://localhost:5000"
+ADMIN_EMAIL="admin@yourdomain.com"
 ```
 
-### 3. Database Setup
+Setup database:
 ```bash
-# Generate Prisma client
 npx prisma generate
-
-# Push schema to database
 npx prisma db push
-
-# Seed with initial data
 npm run db:seed
 ```
 
-### 4. Start Development
+Start backend:
 ```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000` to see the application.
-
-### 5. Default Accounts
-- **Admin**: admin@saastools.com / admin123
-- **Demo Seller**: seller@example.com / seller123
-
-## 🐳 Docker Deployment
-
-### Development
-```bash
-# Start with Docker Compose
-docker-compose up -d
-```
-
-### Production Build
-```bash
-# Build image
-docker build -t saas-tools .
-
-# Run container
-docker run -p 3000:3000 --env-file .env saas-tools
-```
-
-## ☸️ Kubernetes Deployment
+### 2. Frontend Setup
 
 ```bash
-# Apply Kubernetes manifests
-kubectl apply -f k8s/
-
-# Check deployment status
-kubectl get pods -n saas-tools
+cd frontend
+npm install
 ```
 
-## 📊 Database Schema
+Create `.env.local` file:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_FRONTEND_URL=http://localhost:3000
+NEXT_PUBLIC_RAZORPAY_KEY_ID=your-razorpay-key-id
+```
 
-The application uses Prisma with SQLite for data management:
+Start frontend:
+```bash
+npm run dev
+```
 
-- **Users**: Authentication and profile data
-- **Tools**: Available micro-tools and pricing
-- **Subscriptions**: User tool subscriptions
-- **Invoices**: Billing and payment records
-- **Usage**: Tool usage tracking
-- **Landing Content**: CMS-managed page content
-- **Email Templates**: Automated email content
+## 🗄️ Database Configuration for Hostinger MySQL
+
+### 1. Get Database Credentials
+From your Hostinger panel, note:
+- **Host**: Usually `localhost` or specific hostname
+- **Database Name**: Your database name
+- **Username**: Database username
+- **Password**: Database password
+- **Port**: Usually `3306`
+
+### 2. Update DATABASE_URL
+```env
+DATABASE_URL="mysql://username:password@hostname:3306/database_name"
+```
+
+Example:
+```env
+DATABASE_URL="mysql://u123456789_saastools:MyPassword123@localhost:3306/u123456789_saastools"
+```
+
+### 3. Database Schema
+The Prisma schema includes all necessary tables:
+- `users` - User accounts and authentication
+- `tools` - Available micro-tools
+- `subscriptions` - User tool subscriptions
+- `invoices` - Billing and payments
+- `usage` - Tool usage tracking
+- `landing_content` - CMS content
+- `email_templates` - Email automation
+- `api_keys` - API access management
+- `audit_logs` - System audit trail
+
+### 4. Migration Commands
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Push schema to database (for development)
+npx prisma db push
+
+# Create and run migrations (for production)
+npx prisma migrate dev --name init
+
+# View database in browser
+npx prisma studio
+```
+
+## 🔧 Key Features
+
+### Authentication System
+- JWT-based authentication with refresh tokens
+- Email verification
+- Password reset functionality
+- Role-based access control (admin/seller)
+
+### Payment Integration
+- Razorpay subscription management
+- Automated billing cycles
+- Invoice generation with PDF
+- Webhook handling for payment events
+
+### Tool System
+- Modular micro-tool architecture
+- Usage tracking and limits
+- Subscription-based access control
+- API rate limiting
+
+### Admin Portal
+- User management
+- Tool management
+- Analytics dashboard
+- Manual invoicing
+- Email template management
+- CMS for landing page
+
+### Email System
+- Template-based emails
+- SMTP configuration
+- Automated notifications
+- Welcome, verification, and billing emails
+
+## 📁 Project Structure
+
+```
+├── backend/                 # Express.js API server
+│   ├── routes/             # API route handlers
+│   ├── lib/                # Utility libraries
+│   ├── prisma/             # Database schema
+│   ├── scripts/            # Database seeding
+│   └── server.js           # Main server file
+├── frontend/               # Next.js frontend
+│   ├── app/                # Next.js app directory
+│   ├── components/         # React components
+│   ├── lib/                # Frontend utilities
+│   └── public/             # Static assets
+└── README.md
+```
 
 ## 🔐 Security Features
 
-- **JWT Authentication**: Secure token-based auth
-- **Password Hashing**: bcrypt with salt rounds
-- **Input Validation**: Zod schema validation
-- **Rate Limiting**: Prevent API abuse
-- **CORS Protection**: Configure allowed origins
-- **SQL Injection Prevention**: Prisma ORM queries
-- **XSS Protection**: React's built-in sanitization
+- Helmet.js for security headers
+- CORS configuration
+- Rate limiting
+- Input validation
+- SQL injection prevention (Prisma)
+- XSS protection
+- JWT token expiration
+- Password hashing with bcrypt
 
-## 💳 Payment Integration
+## 🚀 Deployment
 
-### Razorpay Setup
-1. Create Razorpay account
-2. Get API keys from dashboard
-3. Configure webhook endpoints
-4. Test with Razorpay's test cards
+### Backend Deployment
+1. Set `NODE_ENV=production`
+2. Configure production database URL
+3. Set secure JWT secrets
+4. Configure SMTP for production
+5. Deploy to your preferred platform (Railway, Heroku, DigitalOcean)
 
-### Supported Features
-- Annual subscriptions (₹5/tool/month billed yearly)
-- Manual one-off invoices
-- Webhook handling for payment status
-- Automated subscription renewal
-- Failed payment retry logic
+### Frontend Deployment
+1. Update `NEXT_PUBLIC_API_URL` to production backend URL
+2. Build the application: `npm run build`
+3. Deploy to Vercel, Netlify, or your preferred platform
 
-## 📧 Email System
+## 📊 Default Accounts
 
-### Templates
-- Welcome email with verification
-- Password reset
-- Subscription confirmation
-- Payment receipts
-- Usage reminders
+After seeding:
+- **Admin**: admin@saastools.com / admin123
+- **Demo Seller**: seller@example.com / seller123
 
-### SMTP Configuration
-Supports major email providers:
-- Gmail (recommended for development)
-- SendGrid (recommended for production)
-- Amazon SES
-- Custom SMTP servers
+## 🛠️ Development Commands
 
-## 🛡️ API Documentation
-
-### Authentication Endpoints
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/verify` - Email verification
-- `POST /api/auth/refresh` - Token refresh
-
-### Tool Endpoints
-- `GET /api/tools` - List available tools
-- `POST /api/tools/{id}/subscribe` - Subscribe to tool
-- `POST /api/tools/keyword-research` - Keyword research
-
-### Admin Endpoints
-- `GET /api/admin/users` - User management
-- `GET /api/admin/analytics` - Platform analytics
-- `POST /api/admin/invoices` - Generate invoices
-
-## 🧪 Testing
-
+### Backend
 ```bash
-# Run all tests
-npm test
-
-# Run specific test suite
-npm test auth
-
-# Run with coverage
-npm test -- --coverage
+npm run dev          # Start development server
+npm run start        # Start production server
+npm run db:push      # Push schema changes
+npm run db:seed      # Seed database
+npx prisma studio    # Database GUI
 ```
 
-## 📈 Monitoring & Analytics
-
-### Key Metrics
-- Monthly Recurring Revenue (MRR)
-- Customer Acquisition Cost (CAC)
-- Churn Rate
-- Tool Usage Statistics
-- API Response Times
-
-### Dashboard Features
-- Real-time user activity
-- Revenue tracking
-- Tool popularity metrics
-- User engagement scores
-
-## 🚀 Deployment Strategies
-
-### Staging Environment
-- Automated deployment on `develop` branch
-- Integration testing
-- Manual QA validation
-
-### Production Environment
-- Blue-green deployment
-- Health checks
-- Rollback capabilities
-- Zero-downtime updates
-
-## 🔧 Configuration
-
-### Environment Variables
+### Frontend
 ```bash
-# Database
-DATABASE_URL="file:./dev.db"
-
-# Authentication
-JWT_SECRET="your-secret-key"
-JWT_REFRESH_SECRET="your-refresh-secret"
-
-# Payments
-RAZORPAY_KEY_ID="your-razorpay-key"
-RAZORPAY_KEY_SECRET="your-razorpay-secret"
-
-# Email
-SMTP_HOST="smtp.gmail.com"
-SMTP_USER="your-email@gmail.com"
-SMTP_PASS="your-app-password"
-
-# Application
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-ADMIN_EMAIL="admin@yourdomain.com"
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
 ```
 
-## 🤝 Contributing
+## 🔧 Environment Variables
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+### Backend Required
+- `DATABASE_URL` - MySQL connection string
+- `JWT_SECRET` - Access token secret
+- `JWT_REFRESH_SECRET` - Refresh token secret
+- `SMTP_*` - Email configuration
+- `RAZORPAY_*` - Payment gateway keys
 
-## 📝 License
+### Frontend Required
+- `NEXT_PUBLIC_API_URL` - Backend API URL
+- `NEXT_PUBLIC_RAZORPAY_KEY_ID` - Razorpay public key
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 📞 Support
 
-## 🆘 Support
+For issues and questions:
+1. Check the logs in both backend and frontend
+2. Verify database connection
+3. Ensure all environment variables are set
+4. Check API endpoints are accessible
 
-For support and questions:
-- Create an issue on GitHub
-- Email: support@saastools.com
-- Documentation: /docs
-- Community: Discord server
+## 🎯 Next Steps
 
-## 🎯 Roadmap
-
-### Phase 1 (Current)
-- ✅ Core authentication system
-- ✅ Basic tool subscription
-- ✅ Keyword research tool
-- ✅ Admin portal foundation
-
-### Phase 2 (Next)
-- 📍 Additional e-commerce tools
-- 📍 Advanced analytics dashboard
-- 📍 Mobile app development
-- 📍 API marketplace integration
-
-### Phase 3 (Future)
-- 📍 AI-powered insights
-- 📍 Multi-language support
-- 📍 Enterprise features
-- 📍 White-label solutions
+1. Configure your Hostinger MySQL database
+2. Set up email SMTP (Gmail, SendGrid, etc.)
+3. Configure Razorpay for payments
+4. Customize the landing page content
+5. Add your own micro-tools
+6. Deploy to production
 
 ---
 
