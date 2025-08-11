@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  password    String
+  name        String
+  role        String    @default("seller") // seller, admin
+  isVerified  Boolean   @default(false)
+  verificationToken String?
+  resetToken  String?
+  resetTokenExpiry DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Seller specific
+  subscriptions Subscription[]
+  invoices      Invoice[]
+  usage         Usage[]
+  
+  @@map("users")
+}
+
+model Tool {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  price       Float     // Monthly price
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  subscriptions Subscription[]
+  usage         Usage[]
+  
+  @@map("tools")
+}
+
+model Subscription {
+  id              String    @id @default(cuid())
+  userId          String
+  toolId          String
+  razorpaySubId   String?   @unique
+  status          String    @default("active") // active, cancelled, expired
+  startDate       DateTime  @default(now())
+  endDate         DateTime
+  amount          Float
+  billingCycle    String    @default("annual") // monthly, annual
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool            Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id              String    @id @default(cuid())
+  userId          String
+  invoiceNumber   String    @unique
+  amount          Float
+  status          String    @default("pending") // pending, paid, failed
+  type            String    @default("subscription") // subscription, manual
+  description     String
+  razorpayOrderId String?
+  pdfPath         String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("invoices")
+}
+
+model Usage {
+  id        String    @id @default(cuid())
+  userId    String
+  toolId    String
+  count     Int       @default(1)
+  metadata  String?   // JSON string for tool-specific data
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool      Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  
+  @@map("usage")
+}
+
+model LandingPageContent {
+  id          String    @id @default(cuid())
+  section     String    @unique // hero, features, pricing, footer
+  content     String    // JSON string
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("landing_content")
+}
+
+model EmailTemplate {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  subject     String
+  htmlContent String
+  textContent String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("email_templates")
+}

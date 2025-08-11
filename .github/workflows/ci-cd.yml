@@ -1,0 +1,79 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Generate Prisma client
+      run: npx prisma generate
+    
+    - name: Run linting
+      run: npm run lint
+    
+    - name: Run type checking
+      run: npx tsc --noEmit
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Build Docker image
+      run: docker build -t saas-tools:${{ github.sha }} .
+    
+    - name: Tag image as latest
+      run: docker tag saas-tools:${{ github.sha }} saas-tools:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to staging
+      run: echo "Deploy to staging environment"
+      # Add your deployment scripts here
+    
+    - name: Run health checks
+      run: echo "Running health checks"
+      # Add health check scripts here
+    
+    - name: Deploy to production
+      if: success()
+      run: echo "Deploy to production environment"
+      # Add production deployment scripts here
